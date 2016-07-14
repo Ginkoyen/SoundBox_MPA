@@ -1,0 +1,253 @@
+/* - Nombre d'octets par variantes - */
+#define nOc_rID 4
+#define nOc_rLen 4
+#define nOc_wID 4
+// Format Chunk
+#define nOc_fld 4
+#define nOc_fLen 4
+#define nOc_wFormatTag 2
+#define nOc_nChannels 2
+#define nOc_nSamplesPerSec 4
+#define nOc_nAvgBytesPerSec 4
+#define nOc_nBlockAlign 2
+#define nOc_nBitsPerSample 2
+// WAVE Data Chunk
+#define nOc_dld 4
+#define nOc_dLen 4
+#define nOc_dData 0
+/* - Numero de la variantes - */
+#define nV_rID 0
+#define nV_rLen 1
+#define nV_wID 2
+// Format Chunk
+#define nV_fld 3
+#define nV_fLen 4
+#define nV_wFormatTag 5
+#define nV_nChannels 6
+#define nV_nSamplesPerSec 7
+#define nV_nAvgBytesPerSec 8
+#define nV_nBlockAlign 9
+#define nV_nBitsPerSample 10
+// WAVE Data Chunk
+#define nV_dld 11
+#define nV_dLen 12
+#define nV_dData 13
+/* ---------------------------------- */
+
+Dec to Bin
+Assemble
+Bin to Dec
+
+
+int readValueFile(File *Fichier, unsigned int nOc_varianteSize, int *cursorPos)
+}
+  int charVar[nOc_varianteSize * 8];
+  int varianteValue = 0;
+  
+  for (int i =0; i < nOc_varianteSize; i++)
+  {
+    charValue = Fichier->read();
+    
+    if (charValue != '32')
+      charValue = 0;
+      
+    for (int j = 0; j < 8; j++)
+    {
+      charVar[j+(i*8)] = charValue ℅ 2;
+      charValue = charValue / 2;
+    } 
+  }
+  
+  for (int i = 0; i < (nOc_varianteSize*8); i++)
+  {
+    varianteValue += charVar[i] * puis(2, i);
+  }
+  
+  *cursorPos += nOc_varianteSize;
+  return varianteValue;
+}
+
+
+int decode_entete( File *FichierSon, int *rLen, int *fLen, int *FormatTag,
+                    int *nChannels, int *nSamplesPerSec, int *nAvgBytesPerSec,
+                    int *nBlockAlign, int *nBitsPerSample, int *dLen )
+{
+  int i, variantes = nV_rID;
+  bool endEntete = false;
+  char charSound = ' ';
+
+  /* - Infos fichier - */
+  *rLen = 0;
+  *fLen = 0;
+  *FormatTag = 0;
+  *nChannels = 0;
+  *nSamplesPerSec = 0;
+  *nAvgBytesPerSec = 0;
+  *nBlockAlign = 0;
+  *nBitsPerSample = 0;
+  *dLen = 0;
+
+  while (!endEntete)
+  {
+    i = 0;
+    switch(variantes)
+    {
+      case nV_rID:
+        for (i; i < nOc_rID; i++)
+        {
+          charSound = FichierSon->read();
+          if (i = 0 && charSound != 'R')
+            variantes = 999;
+          else if (i = 1 && charSound != 'I')
+            variantes = 999;
+          else if (i = 2 && charSound != 'F')
+            variantes = 999;
+          else if (i = 3 && charSound != 'F')
+            variantes = 999;
+        }
+        variantes++;
+      break;
+
+      case nV_rLen:
+        *rLen = readValueFile(&Fichier, nOc_rLen, &cursorPos);
+        variantes++;
+      break;
+
+      case nV_wID:
+        for (i; i < nOc_wID; i++)
+        {
+          charSound = FichierSon->read();
+          if (i = 0 && charSound != 'W')
+            variantes = 999;
+          else if (i = 1 && charSound != 'A')
+            variantes = 999;
+          else if (i = 2 && charSound != 'V')
+            variantes = 999;
+          else if (i = 3 && charSound != 'E')
+            variantes = 999;
+        }
+        variantes++;
+      break;
+
+      case nV_fld:
+        for (i; i < nOc_fld; i++)
+        {
+          charSound = FichierSon->read();
+          if (i = 0 && charSound != 'f')
+            variantes = 999;
+          else if (i = 1 && charSound != 'm')
+            variantes = 999;
+          else if (i = 2 && charSound != 't')
+            variantes = 999;
+          else if (i = 3 && charSound != ' ')
+            variantes = 999;
+        }
+        variantes++;
+      break;
+
+      case nV_fLen:
+        *fLen = readValueFile(&Fichier, nOc_fLen, &cursorPos);
+        variantes++;
+      break;
+
+      case nV_wFormatTag:
+        *FormatTag = readValueFile(&Fichier, nOc_wFormatTag, &cursorPos);
+        variantes++;
+      break;
+
+      case nV_nChannels:
+        *nChannnels = readValueFile(&Fichier, nOc_nChannels, &cursorPos);
+        variantes++;
+      break;
+
+      case nV_nSamplesPerSec:
+        string char_nSamplesPerSec = "";
+        for (i; i < nOc_nSamplesPerSec; i++)
+        {
+          charSound = FichierSon->read();
+          if (charSound != '32')
+            char_nSamplesPerSec += charSound;
+        }
+        *nSamplesPerSec = char_nSamplesPerSec;
+        variantes++;
+      break;
+
+      case nV_nAvgBytesPerSec:
+        string char_nAvgBytesPerSec = "";
+        for (i; i < nOc_nAvgBytesPerSec; i++)
+        {
+          charSound = FichierSon->read();
+          if (charSound != '32')
+            char_nAvgBytesPerSec += charSound;
+        }
+        *nAvgBytesPerSec = char_nAvgBytesPerSec;
+        variantes++;
+      break;
+
+      case nV_nBlockAlign:
+        string char_nBlockAlign = "";
+        for (i; i < nOc_nBlockAlign; i++)
+        {
+          charSound = FichierSon->read();
+          if (charSound != '32')
+            char_nBlockAlign += charSound;
+        }
+        *nBlockAlign = char_nBlockAlign;
+        variantes++;
+      break;
+
+      case nV_nBitsPerSample:
+        string char_nBitsPerSample = "";
+        for (i; i < nOc_nBitsPerSample; i++)
+        {
+          charSound = FichierSon->read();
+          if (charSound != '32')
+            char_nBitsPerSample += charSound;
+        }
+        *nBitsPerSample = char_nBitsPerSample;
+        variantes++;
+      break;
+
+      case nV_dld:
+        int dataTest = 0;
+        while (charSound != 'd' && dataTest != 3)
+        {
+          charSound = FichierSon->read();
+          if (charSound == 'd')
+          {
+            dataTest = 0;
+            for (i; i < nOc_fld - 1; i++)
+            {
+              charSound = FichierSon->read();
+              if (i = 0 && charSound = 'a')
+                dataTest = 1;
+              else if (i = 1 && charSound = 't' && dataTest == 1)
+                dataTest = 2;
+              else if (i = 2 && charSound = 'a' && dataTest == 2)
+                dataTest = 3;
+            }
+          }
+        }
+        variantes++;
+      break;
+
+      case nV_dLen:
+        string char_dLen = "";
+        for (i; i < nOc_dLen; i++)
+        {
+          charSound = FichierSon->read();
+          if (charSound != '32')
+            char_dLen += charSound;
+        }
+        *dLen = char_dLen;
+        endEntete = true;
+      break;
+
+      case default;
+        Serial.println('Impossible de d�coder le fichier');
+        endEntete = true;
+      break;
+    }
+  }
+  return 1;
+}
